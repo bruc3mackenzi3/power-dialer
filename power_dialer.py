@@ -3,17 +3,9 @@ import logging
 from pprint import pformat
 import random
 
+import config
 from state import AgentState, LeadState
 from db import AgentCollection, LeadCollection
-
-
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
-
-# Ratio of concurrent calls per agent
-DIAL_RATIO = 2
-# Ratio of succesful to failed calls
-SUCCESS_RATIO = 0.5
-NUMBER_OF_AGENTS = 2
 
 
 class PowerDialer:
@@ -27,7 +19,7 @@ class PowerDialer:
         self.agent_collection = AgentCollection(self.agent_id)
 
         number_of_leads = self.agent_collection.get_number_of_leads()  # should always return zero
-        while (number_of_leads) < DIAL_RATIO:
+        while (number_of_leads) < config.DIAL_RATIO:
             lead = LeadCollection.get_lead_phone_number_to_dial()
             if lead:
                 number_of_leads += 1
@@ -63,7 +55,7 @@ class PowerDialer:
         # TODO: remove duplicate code below by moving to helper function
         # Attempt to fill back up
         number_of_leads = self.agent_collection.get_number_of_leads()
-        while (number_of_leads < DIAL_RATIO):
+        while (number_of_leads < config.DIAL_RATIO):
             lead = LeadCollection.get_lead_phone_number_to_dial()
             if lead:
                 self.agent_collection.add_lead(lead)
@@ -81,7 +73,7 @@ class PowerDialer:
 
         # Attempt to fill back up
         number_of_leads = self.agent_collection.get_number_of_leads()
-        while (number_of_leads < DIAL_RATIO):
+        while (number_of_leads < config.DIAL_RATIO):
             lead = LeadCollection.get_lead_phone_number_to_dial()
             if lead:
                 self.agent_collection.add_lead(lead)
@@ -96,7 +88,7 @@ class PowerDialer:
         self.agent_state = state
 
 
-# services you can call
+# Implementation of dial service
 def dial(agent_id: str, lead_phone_number: str):
     ''' Given a lead_phone_number (assumed to be QUEUED) dial the number.
     Once complete set the state in the DB which can be checked by the calling
@@ -105,7 +97,7 @@ def dial(agent_id: str, lead_phone_number: str):
     The result of the call is mocked with random numbers.  Adjust SUCCESS_RATIO
     to configure this.
     '''
-    if SUCCESS_RATIO > random.random():
+    if config.SUCCESS_RATIO > random.random():
         dial_result = LeadState.STARTED
     else:
         dial_result = LeadState.FAILED
@@ -114,7 +106,7 @@ def dial(agent_id: str, lead_phone_number: str):
 
 def main():
     dialers = []
-    for i in range(NUMBER_OF_AGENTS):
+    for i in range(config.NUMBER_OF_AGENTS):
         dialer = PowerDialer('agent' + str(i+1))
         dialer.on_agent_login()
         dialers.append(dialer)
