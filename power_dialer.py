@@ -18,7 +18,7 @@ class PowerDialer:
         self._alter_agent_state(AgentState.OFFLINE)
 
 
-    def on_agent_login(self) -> int:
+    def on_agent_login(self):
         self._alter_agent_state(AgentState.IDLE)
         self.agent_collection = AgentCollection(self.agent_id)
 
@@ -32,15 +32,13 @@ class PowerDialer:
             else:
                 break  # out of numbers
 
-        return self.agent_collection.get_number_of_leads()
-
 
     def on_agent_logout(self):
         self._alter_agent_state(AgentState.OFFLINE)
         self.agent_collection.remove_agent()
 
 
-    def on_call_started(self, lead_phone_number: str) -> int:
+    def on_call_started(self, lead_phone_number: str):
         self._alter_agent_state(AgentState.ENGAGED)
 
         # Modify state of current calls
@@ -53,10 +51,8 @@ class PowerDialer:
                 self.agent_collection.remove_lead(lead)
                 # if call failed to nothing
 
-        return self.agent_collection.get_number_of_leads()
 
-
-    def on_call_failed(self, lead_phone_number: str) -> int:
+    def on_call_failed(self, lead_phone_number: str):
         # Remove number
         self.agent_collection.remove_lead(lead_phone_number)
 
@@ -72,10 +68,8 @@ class PowerDialer:
             else:
                 break  # the pool is out of numbers
 
-        return self.agent_collection.get_number_of_leads()
 
-
-    def on_call_ended(self, lead_phone_number: str) -> int:
+    def on_call_ended(self, lead_phone_number: str):
         ''' Remove number from local state and dial next number
         '''
         self._alter_agent_state(AgentState.IDLE)
@@ -91,8 +85,6 @@ class PowerDialer:
                 number_of_leads += 1
             else:
                 break  # the pool is out of numbers
-
-        return self.agent_collection.get_number_of_leads()
 
 
     def _alter_agent_state(self, state: AgentState):
@@ -112,10 +104,10 @@ def dial(agent_id: str, lead_phone_number: str):
 
 def main():
     dialer = PowerDialer('agent1')
-    number_of_leads = dialer.on_agent_login()
+    dialer.on_agent_login()
 
     # main event loop
-    while number_of_leads > 0:
+    while dialer.agent_collection.get_number_of_leads() > 0:
         # Print out current state
         print()
         pprint(dialer.agent_collection.get_leads())
@@ -127,11 +119,11 @@ def main():
 
         # State machine
         if dialer.agent_state == AgentState.IDLE and lead_state == LeadState.STARTED:
-            number_of_leads = dialer.on_call_started(lead)
+            dialer.on_call_started(lead)
         elif dialer.agent_state == AgentState.IDLE and lead_state == LeadState.FAILED:
-            number_of_leads = dialer.on_call_failed(lead)
+            dialer.on_call_failed(lead)
         elif dialer.agent_state == AgentState.ENGAGED:
-            number_of_leads = dialer.on_call_ended(lead)
+            dialer.on_call_ended(lead)
 
     dialer.on_agent_logout()
 
