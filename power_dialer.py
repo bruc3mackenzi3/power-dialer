@@ -9,7 +9,10 @@ from db import AgentCollection, LeadCollection
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
 
+# Ratio of concurrent calls per agent
 DIAL_RATIO = 2
+# Ratio of succesful to failed calls
+SUCCESS_RATIO = 0.5
 NUMBER_OF_AGENTS = 2
 
 
@@ -98,8 +101,14 @@ def dial(agent_id: str, lead_phone_number: str):
     ''' Given a lead_phone_number (assumed to be QUEUED) dial the number.
     Once complete set the state in the DB which can be checked by the calling
     code.
+
+    The result of the call is mocked with random numbers.  Adjust SUCCESS_RATIO
+    to configure this.
     '''
-    dial_result = random.choice([LeadState.STARTED, LeadState.FAILED])
+    if SUCCESS_RATIO > random.random():
+        dial_result = LeadState.STARTED
+    else:
+        dial_result = LeadState.FAILED
     LeadCollection.update_state(lead_phone_number, dial_result)
 
 
