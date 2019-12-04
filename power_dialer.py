@@ -9,7 +9,8 @@ from db import AgentCollection, LeadCollection
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s %(message)s')
 
-DIAL_RATIO = 3
+DIAL_RATIO = 2
+NUMBER_OF_AGENTS = 2
 
 
 class PowerDialer:
@@ -103,31 +104,37 @@ def dial(agent_id: str, lead_phone_number: str):
 
 
 def main():
-    dialer = PowerDialer('agent1')
-    dialer.on_agent_login()
+    dialers = []
+    for i in range(NUMBER_OF_AGENTS):
+        dialer = PowerDialer('agent' + str(i+1))
+        dialer.on_agent_login()
+        dialers.append(dialer)
 
     # main event loop
-    while dialer.agent_collection.get_number_of_leads() > 0:
-        # Print out current state
-        print()
-        pprint(dialer.agent_collection.get_leads())
-        pprint(LeadCollection._leads)
+    while len(dialers) > 0:
+        for dialer in dialers:
+            if dialer.agent_collection.get_number_of_leads() > 0:
+                # Print out current state
+                print('\n' + dialer.agent_id)
+                pprint(dialer.agent_collection.get_leads())
+                pprint(LeadCollection._leads)
 
-        # Get latest Lead and Agent states
-        lead = dialer.agent_collection.get_next_lead()
-        lead_state = LeadCollection.get_state(lead)
+                # Get latest Lead and Agent states
+                lead = dialer.agent_collection.get_next_lead()
+                lead_state = LeadCollection.get_state(lead)
 
-        # State machine
-        if dialer.agent_state == AgentState.IDLE and lead_state == LeadState.STARTED:
-            dialer.on_call_started(lead)
-        elif dialer.agent_state == AgentState.IDLE and lead_state == LeadState.FAILED:
-            dialer.on_call_failed(lead)
-        elif dialer.agent_state == AgentState.ENGAGED:
-            dialer.on_call_ended(lead)
+                # State machine
+                if dialer.agent_state == AgentState.IDLE and lead_state == LeadState.STARTED:
+                    dialer.on_call_started(lead)
+                elif dialer.agent_state == AgentState.IDLE and lead_state == LeadState.FAILED:
+                    dialer.on_call_failed(lead)
+                elif dialer.agent_state == AgentState.ENGAGED:
+                    dialer.on_call_ended(lead)
+            else:
+                dialer.on_agent_logout()
+                dialers.remove(dialer)
 
-    dialer.on_agent_logout()
-
-    print()
+    print('\nLEADS POOL FINAL STATE')
     pprint(LeadCollection._leads)
 
 
