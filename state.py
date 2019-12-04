@@ -5,6 +5,9 @@ class AgentState(enum.Enum):
     IDLE = 2
     ENGAGED = 3
 
+    def __repr__(self):
+        return str(self)
+
 class LeadState(enum.Enum):
     AVAILABLE = 1
     QUEUED = 2
@@ -12,3 +15,6 @@ class LeadState(enum.Enum):
     FAILED = 4
     ENDED = 5
     ABANDONED = 6
+
+    def __repr__(self):
+        return str(self)

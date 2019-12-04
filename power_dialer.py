@@ -1,13 +1,13 @@
 
 import logging
-from pprint import pprint
+from pprint import pformat
 import random
 
 from state import AgentState, LeadState
 from db import AgentCollection, LeadCollection
 
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
 
 DIAL_RATIO = 2
 NUMBER_OF_AGENTS = 2
@@ -89,7 +89,7 @@ class PowerDialer:
 
 
     def _alter_agent_state(self, state: AgentState):
-        logging.info(str(state))
+        logging.info('{} {}'.format(self.agent_id, str(state)))
         self.agent_state = state
 
 
@@ -113,11 +113,14 @@ def main():
     # main event loop
     while len(dialers) > 0:
         for dialer in dialers:
+            logging.debug('================')
             if dialer.agent_collection.get_number_of_leads() > 0:
                 # Print out current state
-                print('\n' + dialer.agent_id)
-                pprint(dialer.agent_collection.get_leads())
-                pprint(LeadCollection._leads)
+                logging.debug('{}\n{}\n{}'.format(
+                        dialer.agent_id,
+                        pformat(dialer.agent_collection.get_leads()),
+                        pformat(LeadCollection._leads)
+                ))
 
                 # Get latest Lead and Agent states
                 lead = dialer.agent_collection.get_next_lead()
@@ -134,8 +137,7 @@ def main():
                 dialer.on_agent_logout()
                 dialers.remove(dialer)
 
-    print('\nLEADS POOL FINAL STATE')
-    pprint(LeadCollection._leads)
+    logging.info('LEADS POOL FINAL STATE\n{}'.format(pformat(LeadCollection._leads)))
 
 
 if __name__ == '__main__':
