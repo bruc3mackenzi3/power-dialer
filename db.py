@@ -27,7 +27,8 @@ class AgentCollection:
             return None
 
     def get_leads(self) -> list:
-        return AgentCollection._agents[self.agent_id]
+        # Lists are mutable so return a copy
+        return AgentCollection._agents[self.agent_id].copy()
 
     def remove_lead(self, lead_phone_number: str):
         AgentCollection._agents[self.agent_id].remove(lead_phone_number)

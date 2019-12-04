@@ -25,9 +25,12 @@ class LeadState(enum.Enum):
 DIAL_RATIO = 2
 
 lead_phone_numbers_pool = {
-    '865-384-6115': LeadState.AVAILABLE,
-    '682-911-0414': LeadState.AVAILABLE,
-    '618-763-9619': LeadState.AVAILABLE
+    '222-384-6115': LeadState.AVAILABLE,
+    '333-911-0414': LeadState.AVAILABLE,
+    '444-763-9619': LeadState.AVAILABLE,
+    '555-430-7663': LeadState.AVAILABLE,
+    '666-919-5533': LeadState.AVAILABLE,
+    '777-609-4348': LeadState.AVAILABLE
 }
 
 
@@ -37,7 +40,7 @@ class PowerDialer:
         self._alter_agent_state(AgentState.OFFLINE)
 
 
-    def on_agent_login(self):
+    def on_agent_login(self) -> int:
         self._alter_agent_state(AgentState.IDLE)
         self.agent_collection = AgentCollection(self.agent_id)
 
@@ -59,7 +62,7 @@ class PowerDialer:
         self.agent_collection.remove_agent()
 
 
-    def on_call_started(self, lead_phone_number: str):
+    def on_call_started(self, lead_phone_number: str) -> int:
         self._alter_agent_state(AgentState.ENGAGED)
 
         # Modify state of current calls
@@ -75,8 +78,29 @@ class PowerDialer:
         return self.agent_collection.get_number_of_leads()
 
 
-    def on_call_failed(self, lead_phone_number: str):
+    def on_call_failed(self, lead_phone_number: str) -> int:
         # Remove number
+        self.agent_collection.remove_lead(lead_phone_number)
+
+        # TODO: remove duplicate code below by moving to helper function
+        # Attempt to fill back up
+        number_of_leads = self.agent_collection.get_number_of_leads()
+        while (number_of_leads < DIAL_RATIO):
+            lead = get_lead_phone_number_to_dial()
+            if lead:
+                self.agent_collection.add_lead(lead)
+                dial(self.agent_id, lead)
+                number_of_leads += 1
+            else:
+                break  # the pool is out of numbers
+
+        return self.agent_collection.get_number_of_leads()
+
+
+    def on_call_ended(self, lead_phone_number: str) -> int:
+        ''' Remove number from local state and dial next number
+        '''
+        self._alter_agent_state(AgentState.IDLE)
         self.agent_collection.remove_lead(lead_phone_number)
 
         # Attempt to fill back up
@@ -93,22 +117,7 @@ class PowerDialer:
         return self.agent_collection.get_number_of_leads()
 
 
-    def on_call_ended(self, lead_phone_number: str):
-        ''' Remove number from local state and dial next number
-        '''
-        self._alter_agent_state(AgentState.IDLE)
-        self.agent_collection.remove_lead(lead_phone_number)
-
-        # TODO: adapt loop from on_call_failed
-        lead = get_lead_phone_number_to_dial()
-        if lead:
-            self.agent_collection.add_lead(lead)
-            dial(self.agent_id, lead)
-
-        return self.agent_collection.get_number_of_leads()
-
-
-    def _alter_agent_state(self, state):
+    def _alter_agent_state(self, state: AgentState):
         logging.info(str(state))
         self.agent_state = state
 
