@@ -34,6 +34,9 @@ Finally adjust the log level set in the logging config call.  Levels utilized in
 ### Testing
 Unit tests are implemented testing the `db.py` module.  No tests for power_dialer.py for now due to time constraints.  Due to the relatively complex flow of the Agent and Lead states automated testing is a fair bit of work.  For now validation has relied on manual testing.
 
+## State Diagram
+![Power Dialer State Diagram](https://github.com/bruc3mackenzi3/power-dialer/blob/master/doc/PowerDialerStateDiagram.png)
+
 # Original Instructions
 
 ## The Problem
