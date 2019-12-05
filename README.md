@@ -12,7 +12,11 @@ or:
 python3 power_dialer.py
 ```
 
-Program execution can be observed on stdout.
+The dialer's execution and state flow can be observed on stdout.  More on configuring this below.
+
+Run the unit tests with the following:
+```
+python test/db_test
 
 ### Configuration
 
@@ -22,9 +26,12 @@ The Power Dialer app behaviour can be altered with the configuration file `confi
 
 `SUCCESS_RATIO` represents the percentage of calls that will succeed in the lead answering the phone, as a decimal.  For example, with a success ratio of 0.25 one call will suceed for every 3 failures.
 
-`NUMBER_OF_AGENTS` is the number of concurrent agents online.  Try running with 1 and 2 as a starting point.  Also try running more agents than there are leads in the pool * DIAL RATIO.
+`NUMBER_OF_AGENTS` is the number of concurrent agents online.  Try running with 1 and 2 as a starting point.  Also try running more agents than there are leads in the pool * DIAL_RATIO.
 
 Finally adjust the log level set in the logging config call.  Levels utilized in this app are `WARNING`, `INFO`, and `DEBUG`.
+
+### Testing
+Unit tests are implemented testing the `db.py` module.  No tests for power_dialer.py for now due to time constraints.  Due to the relatively complex flow of the Agent and Lead states automated testing is a fair bit of work.  For now validation has relied on manual testing.
 
 # Original Instructions
 
