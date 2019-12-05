@@ -9,4 +9,4 @@ SUCCESS_RATIO = 0.5
 
 NUMBER_OF_AGENTS = 2
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(levelname)s %(message)s')

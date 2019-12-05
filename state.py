@@ -1,5 +1,6 @@
 import enum
 
+
 class AgentState(enum.Enum):
     OFFLINE = 1
     IDLE = 2
@@ -7,6 +8,7 @@ class AgentState(enum.Enum):
 
     def __repr__(self):
         return str(self)
+
 
 class LeadState(enum.Enum):
     AVAILABLE = 1

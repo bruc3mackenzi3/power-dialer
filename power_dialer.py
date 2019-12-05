@@ -13,7 +13,6 @@ class PowerDialer:
         self.agent_id = agent_id
         self._alter_agent_state(AgentState.OFFLINE)
 
-
     def on_agent_login(self):
         self._alter_agent_state(AgentState.IDLE)
         self.agent_collection = AgentCollection(self.agent_id)
@@ -28,11 +27,9 @@ class PowerDialer:
             else:
                 break  # out of numbers
 
-
     def on_agent_logout(self):
         self._alter_agent_state(AgentState.OFFLINE)
         self.agent_collection.remove_agent()
-
 
     def on_call_started(self, lead_phone_number: str):
         self._alter_agent_state(AgentState.ENGAGED)
@@ -46,7 +43,6 @@ class PowerDialer:
                     LeadCollection.update_state(lead, LeadState.ABANDONED)
                 self.agent_collection.remove_lead(lead)
                 # if call failed to nothing
-
 
     def on_call_failed(self, lead_phone_number: str):
         # Remove number
@@ -64,7 +60,6 @@ class PowerDialer:
             else:
                 break  # the pool is out of numbers
 
-
     def on_call_ended(self, lead_phone_number: str):
         ''' Remove number from local state and dial next number
         '''
@@ -81,7 +76,6 @@ class PowerDialer:
                 number_of_leads += 1
             else:
                 break  # the pool is out of numbers
-
 
     def _alter_agent_state(self, state: AgentState):
         logging.info('{} {}'.format(self.agent_id, str(state)))
@@ -111,7 +105,9 @@ def main():
         dialer.on_agent_login()
         dialers.append(dialer)
 
-    # main event loop
+    # Main event loop
+    # Takes round robin approach, allowing each agent one turn / state change
+    #  before going on to next.
     while len(dialers) > 0:
         for dialer in dialers:
             logging.debug('================')

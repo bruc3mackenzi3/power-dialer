@@ -2,6 +2,7 @@ import logging
 
 from state import LeadState
 
+
 class AgentCollection:
     ''' Mock database collection for a logged in agent and their current leads.
     '''
@@ -41,6 +42,7 @@ class AgentCollection:
         Raises KeyError if agent_id is missing
         '''
         return len(AgentCollection._agents[self.agent_id])
+
 
 class LeadCollection:
     ''' Mock database collection storing the pool of leads.  Note this is a
