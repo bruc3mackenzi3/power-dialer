@@ -13,10 +13,6 @@ class AgentCollection:
         self.agent_id = agent_id
         AgentCollection._agents[self.agent_id] = []
 
-    def remove_agent(self):
-        if self.agent_id in AgentCollection._agents:
-            del AgentCollection._agents[self.agent_id]
-
     def add_lead(self, lead_phone_number: str):
         ''' Raises KeyError if agent_id is missing
         '''
@@ -42,6 +38,10 @@ class AgentCollection:
         Raises KeyError if agent_id is missing
         '''
         return len(AgentCollection._agents[self.agent_id])
+
+    def remove_agent(self):
+        if self.agent_id in AgentCollection._agents:
+            del AgentCollection._agents[self.agent_id]
 
 
 class LeadCollection:
