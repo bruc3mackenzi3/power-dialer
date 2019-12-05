@@ -17,6 +17,7 @@ The dialer's execution and state flow can be observed on stdout.  More on config
 Run the unit tests with the following:
 ```
 python test/db_test
+```
 
 ### Configuration
 
